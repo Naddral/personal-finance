@@ -16,34 +16,26 @@ router.post('/api/auth/google', async (req, res) => {
         const payload = ticket.getPayload();
         const { sub: googleId, email, name } = payload;
 
-        db.get("SELECT * FROM users WHERE google_id = ?", [googleId], (err, row) => {
-            if (err) {
-                return res.status(500).json({ error: err.message });
-            }
-
-            if (!row) {
-                // Create user
-                db.run("INSERT INTO users (google_id, name, email) VALUES (?, ?, ?)",
-                    [googleId, name, email],
-                    function (err) {
-                        if (err) {
-                            return res.status(500).json({ error: err.message });
-                        }
-                        const newUser = { id: this.lastID, google_id: googleId, name, email };
-                        // Create session manually (simple implementation)
-                        // In production, use express-session or JWT
-                        // For this demo, we'll assume the client stores the Google token or user info
-                        // BUT better to set a session here if using express-session
-                        req.session.userId = newUser.id;
-                        return res.status(201).json(newUser);
-                    }
-                );
-            } else {
-                // User exists
-                req.session.userId = row.id;
-                return res.json(row);
-            }
+        let user = await db.user.findUnique({
+            where: { googleId: googleId }
         });
+
+        if (!user) {
+            // Create user
+            user = await db.user.create({
+                data: {
+                    googleId: googleId,
+                    name: name,
+                    email: email
+                }
+            });
+            req.session.userId = user.id;
+            return res.status(201).json(user);
+        } else {
+            // User exists
+            req.session.userId = user.id;
+            return res.json(user);
+        }
 
     } catch (error) {
         console.error('Error verifying Google token:', error);
@@ -51,16 +43,19 @@ router.post('/api/auth/google', async (req, res) => {
     }
 });
 
-router.get('/api/current_user', (req, res) => {
+router.get('/api/current_user', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json(null);
     }
-    db.get("SELECT * FROM users WHERE id = ?", [req.session.userId], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(row);
-    });
+
+    try {
+        const user = await db.user.findUnique({
+            where: { id: req.session.userId }
+        });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 router.get('/api/logout', (req, res) => {

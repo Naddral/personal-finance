@@ -1,3 +1,4 @@
+require('dotenv').config();
 const db = require('./database/database');
 
 const users = [
@@ -7,7 +8,6 @@ const users = [
 
 const transactions = [
     {
-        user_id: 1, // Will assign to first user
         amount: 1200.00,
         category: 'Stipendio',
         shop: 'Azienda SRL',
@@ -16,7 +16,6 @@ const transactions = [
         type: 'income'
     },
     {
-        user_id: 1,
         amount: 50.00,
         category: 'Spesa',
         shop: 'Coop',
@@ -25,7 +24,6 @@ const transactions = [
         type: 'expense'
     },
     {
-        user_id: 1,
         amount: 25.00,
         category: 'Svago',
         shop: 'Pizzeria Da Michele',
@@ -34,7 +32,6 @@ const transactions = [
         type: 'expense'
     },
     {
-        user_id: 1,
         amount: 80.00,
         category: 'Benzina',
         shop: 'Eni Station',
@@ -43,7 +40,6 @@ const transactions = [
         type: 'expense'
     },
     {
-        user_id: 1,
         amount: 300.00,
         category: 'Affitto',
         shop: 'Padrone di casa',
@@ -53,41 +49,56 @@ const transactions = [
     }
 ];
 
-const seed = () => {
+const seed = async () => {
     console.log('Seeding database...');
 
-    // Insert Users
-    users.forEach(u => {
-        db.run(`INSERT OR IGNORE INTO users (google_id, name, email) VALUES (?, ?, ?)`,
-            [u.google_id, u.name, u.email],
-            function (err) {
-                if (err) console.error(err);
-                else console.log(`User ${u.name} inserted/verified.`);
-            }
-        );
-    });
-
-    // Insert Transactions for User 1
-    // We wait a bit to ensure user 1 exists (simple hack for this script)
-    setTimeout(() => {
-        db.get("SELECT id FROM users WHERE google_id = ?", ['test_user_1'], (err, row) => {
-            if (err || !row) {
-                console.error("User not found for seeding transactions");
-                return;
-            }
-            const userId = row.id;
-
-            transactions.forEach(t => {
-                db.run(`INSERT INTO transactions (user_id, amount, category, shop, description, date, type) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                    [userId, t.amount, t.category, t.shop, t.description, t.date, t.type],
-                    (err) => {
-                        if (err) console.error(err);
-                        else console.log(`Transaction ${t.description} added.`);
-                    }
-                );
+    try {
+        // Insert Users
+        for (const u of users) {
+            await db.user.upsert({
+                where: { googleId: u.google_id },
+                update: {},
+                create: {
+                    googleId: u.google_id,
+                    name: u.name,
+                    email: u.email
+                }
             });
+            console.log(`User ${u.name} inserted/verified.`);
+        }
+
+        // Insert Transactions for User 1
+        const user1 = await db.user.findUnique({
+            where: { googleId: 'test_user_1' }
         });
-    }, 1000);
+
+        if (!user1) {
+            console.error("User not found for seeding transactions");
+            return;
+        }
+
+        for (const t of transactions) {
+            await db.transaction.create({
+                data: {
+                    userId: user1.id,
+                    amount: t.amount,
+                    category: t.category,
+                    shop: t.shop,
+                    description: t.description,
+                    date: t.date,
+                    type: t.type
+                }
+            });
+            console.log(`Transaction ${t.description} added.`);
+        }
+        console.log('Seeding completed successfully.');
+    } catch (err) {
+        console.error('Error during seeding:', err);
+    } finally {
+        // Note: we don't disconnect here because it might interfere if this is called elsewhere,
+        // but as a standalone script it's good practice.
+        // For simplicity in this demo environment, we'll let the process exit.
+    }
 };
 
 seed();

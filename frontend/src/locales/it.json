@@ -1,0 +1,86 @@
+{
+    "common": {
+        "login": "Login",
+        "register": "Registrati",
+        "logout": "Logout",
+        "email": "Email",
+        "password": "Password",
+        "submit": "Invia",
+        "cancel": "Annulla",
+        "edit": "Modifica",
+        "delete": "Elimina",
+        "loading": "Caricamento",
+        "errorDelete": "Errore nella cancellazione della transazione",
+        "search": "Cerca",
+        "reset": "Reset",
+        "noData": "Nessun dato disponibile."
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Benvenuto",
+        "chart": "Grafico",
+        "totalBalance": "Bilancio Totale",
+        "income": "Entrate",
+        "expenses": "Uscite",
+        "recentTransactions": "Transazioni Recenti",
+        "addTransaction": "Aggiungi Transazione",
+        "netSavings": "Risparmio Netto",
+        "total": "Totale"
+    },
+    "charts": {
+        "expenseAnalysis": "Analisi Spese",
+        "incomeAnalysis": "Analisi Entrate",
+        "totalBalance": "Bilancio Totale",
+        "noData": "Nessun dato disponibile per questa categoria."
+    },
+    "filters": {
+        "searchCategory": "Cerca Categoria",
+        "allCategories": "Tutte le categorie",
+        "startDate": "Da Data",
+        "endDate": "A Data"
+    },
+    "transactions": {
+        "description": "Descrizione",
+        "amount": "Importo",
+        "date": "Data",
+        "shop": "Negozio",
+        "category": "Categoria",
+        "type": "Tipo",
+        "actions": "Azioni",
+        "delete": "Elimina",
+        "noTransactions": "Nessuna transazione registrata.",
+        "confirmDelete": "Sei sicuro di voler eliminare questa transazione?",
+        "editTransaction": "Modifica Transazione",
+        "newTransaction": "Nuova Transazione",
+        "selectCategory": "Seleziona categoria",
+        "shopPlaceholder": "Es. Coop, Amazon...",
+        "descriptionPlaceholder": "Dettagli aggiuntivi...",
+        "typeExpense": "Uscita (Spesa)",
+        "typeIncome": "Entrata (Stipendio, Regali...)",
+        "errorSave": "Errore nel salvataggio della transazione",
+        "saveChanges": "Salva Modifiche"
+    },
+    "categories": {
+        "food": "Cibo",
+        "transport": "Trasporti",
+        "utilities": "Utenze",
+        "entertainment": "Intrattenimento",
+        "health": "Salute",
+        "salary": "Stipendio",
+        "other": "Altro",
+        "spese_fisse": "SPESE FISSE",
+        "necessità": "NECESSITÀ",
+        "prelievo": "PRELIEVO",
+        "alimentari": "ALIMENTARI",
+        "benzina": "BENZINA",
+        "fumetti": "FUMETTI",
+        "videogiochi": "VIDEOGIOCHI",
+        "acquisti": "ACQUISTI",
+        "pellet": "PELLET",
+        "crescita": "CRESCITA",
+        "stipendio": "STIPENDIO"
+    },
+    "login": {
+        "subtitle": "Gestisci le tue finanze con eleganza"
+    }
+}

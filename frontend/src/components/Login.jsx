@@ -2,10 +2,13 @@ import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 
 import './Login.css';
 
 const Login = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const handleSuccess = async (credentialResponse) => {
@@ -33,12 +36,15 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                <LanguageSelector />
+            </div>
             <div className="login-card">
                 <h1 className="login-title">
                     Personal Finance Experience
                 </h1>
                 <p className="login-subtitle">
-                    Gestisci le tue finanze con eleganza
+                    {t('login.subtitle')}
                 </p>
 
                 <div style={{ display: 'flex', justifyContent: 'center' }}>

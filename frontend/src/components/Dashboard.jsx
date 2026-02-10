@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import TransactionForm from './TransactionForm';
 import TransactionList from './TransactionList';
 import ExpensesChart from './ExpensesChart';
 import TransactionFilters from './TransactionFilters';
+import LanguageSelector from './LanguageSelector';
 
 const Dashboard = () => {
+    const { t } = useTranslation();
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
@@ -113,20 +116,21 @@ const Dashboard = () => {
             fetchTransactions(); // Refresh list
         } catch (error) {
             console.error('Error deleting transaction:', error);
-            alert('Errore nella cancellazione della transazione');
+            alert(t('common.errorDelete'));
         }
     };
 
-    if (!user) return <div>Caricamento...</div>;
+    if (!user) return <div>{t('common.loading')}...</div>;
 
     return (
         <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', color: '#fff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '2rem' }}>Dashboard</h1>
-                    <p style={{ margin: '5px 0 0', color: '#a0a0b0' }}>Benvenuto, {user.name}!</p>
+                    <h1 style={{ margin: 0, fontSize: '2rem' }}>{t('dashboard.title')}</h1>
+                    <p style={{ margin: '5px 0 0', color: '#a0a0b0' }}>{t('dashboard.welcome')}, {user.name}!</p>
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <LanguageSelector />
                     <button onClick={() => setShowChart(true)} style={{
                         padding: '8px 16px',
                         background: 'linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
@@ -136,7 +140,7 @@ const Dashboard = () => {
                         fontWeight: 'bold',
                         cursor: 'pointer'
                     }}>
-                        📊 Grafico
+                        📊 {t('dashboard.chart')}
                     </button>
                     <button onClick={handleLogout} style={{
                         padding: '8px 16px',
@@ -145,7 +149,7 @@ const Dashboard = () => {
                         borderRadius: '6px',
                         color: '#fff',
                         cursor: 'pointer'
-                    }}>Logout</button>
+                    }}>{t('common.logout')}</button>
                 </div>
             </div>
 

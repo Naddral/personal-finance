@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const TransactionList = ({ transactions, onEdit, onDelete }) => {
+    const { t } = useTranslation();
     return (
         <div style={{
             backgroundColor: '#2a2a40',
@@ -9,27 +11,27 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             overflowX: 'auto'
         }}>
-            <h3 style={{ marginTop: 0, marginBottom: '15px' }}>Ultime Transazioni</h3>
+            <h3 style={{ marginTop: 0, marginBottom: '15px' }}>{t('dashboard.recentTransactions')}</h3>
 
             {transactions.length === 0 ? (
-                <p style={{ color: '#a0a0b0', fontStyle: 'italic' }}>Nessuna transazione registrata.</p>
+                <p style={{ color: '#a0a0b0', fontStyle: 'italic' }}>{t('transactions.noTransactions')}</p>
             ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr style={{ borderBottom: '1px solid #444' }}>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Data</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Negozio</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Categoria</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Descrizione</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Importo</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>Azioni</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.date')}</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.shop')}</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.category')}</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.description')}</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.amount')}</th>
+                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {transactions.map((t) => (
-                            <tr key={t.id} style={{ borderBottom: '1px solid #333' }}>
-                                <td style={{ padding: '10px' }}>{t.date}</td>
-                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{t.shop}</td>
+                        {transactions.map((tx) => (
+                            <tr key={tx.id} style={{ borderBottom: '1px solid #333' }}>
+                                <td style={{ padding: '10px' }}>{tx.date}</td>
+                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{tx.shop}</td>
                                 <td style={{ padding: '10px' }}>
                                     <span style={{
                                         padding: '4px 8px',
@@ -37,21 +39,21 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
                                         background: '#333',
                                         fontSize: '0.85rem'
                                     }}>
-                                        {t.category}
+                                        {t(`categories.${tx.category.toLowerCase().replace(/ /g, '_')}`, { defaultValue: tx.category })}
                                     </span>
                                 </td>
-                                <td style={{ padding: '10px', color: '#ccc', fontSize: '0.9rem' }}>{t.description}</td>
+                                <td style={{ padding: '10px', color: '#ccc', fontSize: '0.9rem' }}>{tx.description}</td>
                                 <td style={{
                                     padding: '10px',
                                     fontWeight: 'bold',
-                                    color: t.type === 'expense' ? '#ff6b6b' : '#4ecd9d'
+                                    color: tx.type === 'expense' ? '#ff6b6b' : '#4ecd9d'
                                 }}>
-                                    {t.type === 'expense' ? '-' : '+'} €{t.amount}
+                                    {tx.type === 'expense' ? '-' : '+'} €{tx.amount}
                                 </td>
                                 <td style={{ padding: '10px' }}>
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button
-                                            onClick={() => onEdit(t)}
+                                            onClick={() => onEdit(tx)}
                                             style={{
                                                 background: 'transparent',
                                                 border: '1px solid #555',
@@ -62,12 +64,12 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
                                                 fontSize: '0.85rem'
                                             }}
                                         >
-                                            Modifica
+                                            {t('common.edit')}
                                         </button>
                                         <button
                                             onClick={() => {
-                                                if (window.confirm('Sei sicuro di voler eliminare questa transazione?')) {
-                                                    onDelete(t.id);
+                                                if (window.confirm(t('transactions.confirmDelete'))) {
+                                                    onDelete(tx.id);
                                                 }
                                             }}
                                             style={{
@@ -80,7 +82,7 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
                                                 fontSize: '0.85rem'
                                             }}
                                         >
-                                            Cancella
+                                            {t('common.delete')}
                                         </button>
                                     </div>
                                 </td>

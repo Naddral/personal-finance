@@ -1,0 +1,86 @@
+{
+    "common": {
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "email": "Email",
+        "password": "Password",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "loading": "Loading",
+        "errorDelete": "Error deleting transaction",
+        "search": "Search",
+        "reset": "Reset",
+        "noData": "No data available."
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome",
+        "chart": "Chart",
+        "totalBalance": "Total Balance",
+        "income": "Income",
+        "expenses": "Expenses",
+        "recentTransactions": "Recent Transactions",
+        "addTransaction": "Add Transaction",
+        "netSavings": "Net Savings",
+        "total": "Total"
+    },
+    "charts": {
+        "expenseAnalysis": "Expense Analysis",
+        "incomeAnalysis": "Income Analysis",
+        "totalBalance": "Total Balance",
+        "noData": "No data available for this category."
+    },
+    "filters": {
+        "searchCategory": "Search Category",
+        "allCategories": "All Categories",
+        "startDate": "Start Date",
+        "endDate": "End Date"
+    },
+    "transactions": {
+        "description": "Description",
+        "amount": "Amount",
+        "date": "Date",
+        "shop": "Shop",
+        "category": "Category",
+        "type": "Type",
+        "actions": "Actions",
+        "delete": "Delete",
+        "noTransactions": "No transactions recorded.",
+        "confirmDelete": "Are you sure you want to delete this transaction?",
+        "editTransaction": "Edit Transaction",
+        "newTransaction": "New Transaction",
+        "selectCategory": "Select category",
+        "shopPlaceholder": "e.g. Amazon, Local Store...",
+        "descriptionPlaceholder": "Additional details...",
+        "typeExpense": "Expense",
+        "typeIncome": "Income",
+        "errorSave": "Error saving transaction",
+        "saveChanges": "Save Changes"
+    },
+    "categories": {
+        "food": "Food",
+        "transport": "Transport",
+        "utilities": "Utilities",
+        "entertainment": "Entertainment",
+        "health": "Health",
+        "salary": "Salary",
+        "other": "Other",
+        "spese_fisse": "FIXED EXPENSES",
+        "necessità": "NECESSITY",
+        "prelievo": "WITHDRAWAL",
+        "alimentari": "GROCERIES",
+        "benzina": "FUEL",
+        "fumetti": "COMICS",
+        "videogiochi": "VIDEO GAMES",
+        "acquisti": "PURCHASES",
+        "pellet": "PELLET",
+        "crescita": "GROWTH",
+        "stipendio": "SALARY"
+    },
+    "login": {
+        "subtitle": "Manage your finances with elegance"
+    }
+}

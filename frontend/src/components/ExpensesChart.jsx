@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a832a8', '#32a8a8', '#a83232'];
 
 const ExpensesChart = ({ transactions, onClose }) => {
+    const { t } = useTranslation();
     const [view, setView] = useState('expense'); // 'expense', 'income', or 'balance'
 
     const { data, total, net } = useMemo(() => {
@@ -17,19 +19,20 @@ const ExpensesChart = ({ transactions, onClose }) => {
 
             return {
                 data: [
-                    { name: 'Entrate', value: income },
-                    { name: 'Uscite', value: expense }
+                    { name: t('dashboard.income'), value: income },
+                    { name: t('dashboard.expenses'), value: expense }
                 ],
                 total: income + expense,
                 net: income - expense
             };
         }
 
-        const filtered = transactions.filter(t => t.type === view);
+        const filtered = transactions.filter(tx => tx.type === view);
         const grouped = filtered.reduce((acc, curr) => {
             const cat = curr.category || 'Altro';
-            if (!acc[cat]) acc[cat] = 0;
-            acc[cat] += parseFloat(curr.amount);
+            const translatedCat = t(`categories.${cat.toLowerCase().replace(/ /g, '_')}`, { defaultValue: cat });
+            if (!acc[translatedCat]) acc[translatedCat] = 0;
+            acc[translatedCat] += parseFloat(curr.amount);
             return acc;
         }, {});
 
@@ -44,9 +47,9 @@ const ExpensesChart = ({ transactions, onClose }) => {
     }, [transactions, view]);
 
     const getTitle = () => {
-        if (view === 'expense') return 'Analisi Spese';
-        if (view === 'income') return 'Analisi Entrate';
-        return 'Bilancio Totale';
+        if (view === 'expense') return t('charts.expenseAnalysis');
+        if (view === 'income') return t('charts.incomeAnalysis');
+        return t('charts.totalBalance');
     };
 
     return (
@@ -94,11 +97,11 @@ const ExpensesChart = ({ transactions, onClose }) => {
                 </h2>
                 {view === 'balance' ? (
                     <p style={{ textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '20px', color: net >= 0 ? '#4ecd9d' : '#ff6b6b' }}>
-                        Risparmio Netto: €{net.toFixed(2)}
+                        {t('dashboard.netSavings')}: €{net.toFixed(2)}
                     </p>
                 ) : (
                     <p style={{ textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '20px', color: view === 'expense' ? '#ff6b6b' : '#4ecd9d' }}>
-                        Totale: €{total.toFixed(2)}
+                        {t('dashboard.total')}: €{total.toFixed(2)}
                     </p>
                 )}
 
@@ -115,7 +118,7 @@ const ExpensesChart = ({ transactions, onClose }) => {
                             fontWeight: view === 'expense' ? 'bold' : 'normal'
                         }}
                     >
-                        Spese
+                        {t('dashboard.expenses')}
                     </button>
                     <button
                         onClick={() => setView('income')}
@@ -129,7 +132,7 @@ const ExpensesChart = ({ transactions, onClose }) => {
                             fontWeight: view === 'income' ? 'bold' : 'normal'
                         }}
                     >
-                        Entrate
+                        {t('dashboard.income')}
                     </button>
                     <button
                         onClick={() => setView('balance')}
@@ -143,7 +146,7 @@ const ExpensesChart = ({ transactions, onClose }) => {
                             fontWeight: view === 'balance' ? 'bold' : 'normal'
                         }}
                     >
-                        Bilancio
+                        {t('dashboard.totalBalance')}
                     </button>
                 </div>
 
@@ -171,7 +174,7 @@ const ExpensesChart = ({ transactions, onClose }) => {
                         </ResponsiveContainer>
                     ) : (
                         <p style={{ textAlign: 'center', color: '#a0a0b0', marginTop: '100px' }}>
-                            Nessun dato disponibile per questa categoria.
+                            {t('charts.noData')}
                         </p>
                     )}
                 </div>

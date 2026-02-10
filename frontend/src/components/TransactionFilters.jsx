@@ -1,7 +1,9 @@
 import React from 'react';
 import { PAYMENT_CATEGORIES } from '../constants/categories';
+import { useTranslation } from 'react-i18next';
 
 const TransactionFilters = ({ filters, onFilterChange }) => {
+    const { t } = useTranslation();
     const [localFilters, setLocalFilters] = React.useState(filters);
 
     // Synchronize local state with props (useful for resets)
@@ -40,22 +42,22 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
             alignItems: 'flex-end'
         }}>
             <div style={{ flex: '1 1 200px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>Cerca Categoria</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.searchCategory')}</label>
                 <select
                     name="category"
                     value={localFilters.category}
                     onChange={handleChange}
                     style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
                 >
-                    <option value="">Tutte le categorie</option>
+                    <option value="">{t('filters.allCategories')}</option>
                     {PAYMENT_CATEGORIES.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                        <option key={cat} value={cat}>{t(`categories.${cat.toLowerCase().replace(/ /g, '_')}`)}</option>
                     ))}
                 </select>
             </div>
 
             <div style={{ flex: '1 1 150px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>Da Data</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.startDate')}</label>
                 <input
                     type="date"
                     name="startDate"
@@ -66,7 +68,7 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
             </div>
 
             <div style={{ flex: '1 1 150px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>A Data</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.endDate')}</label>
                 <input
                     type="date"
                     name="endDate"
@@ -90,7 +92,7 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
                         height: '38px'
                     }}
                 >
-                    Cerca
+                    {t('common.search')}
                 </button>
                 <button
                     onClick={handleReset}
@@ -104,7 +106,7 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
                         height: '38px'
                     }}
                 >
-                    Reset
+                    {t('common.reset')}
                 </button>
             </div>
         </div>

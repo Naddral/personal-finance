@@ -8,12 +8,23 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 router.post('/api/auth/google', async (req, res) => {
     const { token } = req.body;
 
+    if (!token) {
+        return res.status(400).json({ error: 'Missing token' });
+    }
+
+    let payload;
     try {
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID,
         });
-        const payload = ticket.getPayload();
+        payload = ticket.getPayload();
+    } catch (error) {
+        console.error('Error verifying Google token:', error);
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    try {
         const { sub: googleId, email, name } = payload;
 
         let user = await db.user.findUnique({
@@ -38,8 +49,8 @@ router.post('/api/auth/google', async (req, res) => {
         }
 
     } catch (error) {
-        console.error('Error verifying Google token:', error);
-        res.status(401).json({ error: 'Invalid token' });
+        console.error('Error completing Google auth flow:', error);
+        return res.status(500).json({ error: 'Authentication failed' });
     }
 });
 

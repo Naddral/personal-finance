@@ -1,0 +1,41 @@
+.transactions-card{
+  background-color: #232332;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  overflow-x: auto;
+}
+.transactions-title{ margin-top:0; margin-bottom:15px }
+.empty-text{ color:#a0a0b0; font-style:italic }
+.table-wrapper{ overflow-x:auto }
+.transactions-table{ width:100%; border-collapse:collapse; text-align:left }
+.transactions-table thead th{ padding:10px; color:#a0a0b0; border-bottom:1px solid #3a3a55 }
+.transactions-table tbody tr{ border-bottom:1px solid rgba(255,255,255,0.03) }
+.transactions-table tbody tr:nth-child(odd){ background: rgba(255,255,255,0.01) }
+.cell{ padding:10px; vertical-align:middle }
+.cell.nowrap{ white-space:nowrap }
+.badge{ padding:4px 8px; border-radius:12px; background:#333; font-size:0.85rem }
+.amount{ padding:10px; font-weight:600; white-space:nowrap }
+.amount.income{ color:#4ecd9d }
+.amount.expense{ color:#ff6b6b }
+.actions-cell{ padding:10px }
+.btn{ background:transparent; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.85rem }
+.btn-edit{ border:1px solid #555; color:#fff }
+.btn-delete{ border:1px solid #ff4d4d; color:#ff4d4d }
+
+.header-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+}
+
+.header-btn:focus {
+  outline: 2px solid rgba(0,0,0,0.12);
+  border-radius: 4px;
+}

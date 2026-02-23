@@ -1,6 +1,7 @@
 import React from 'react';
 import { PAYMENT_CATEGORIES } from '../constants/categories';
 import { useTranslation } from 'react-i18next';
+import './TransactionFilters.css';
 
 const TransactionFilters = ({ filters, onFilterChange }) => {
     const { t } = useTranslation();
@@ -30,25 +31,10 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
     };
 
     return (
-        <div style={{
-            backgroundColor: '#2a2a40',
-            padding: '20px',
-            borderRadius: '12px',
-            marginBottom: '20px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '15px',
-            alignItems: 'flex-end'
-        }}>
-            <div style={{ flex: '1 1 200px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.searchCategory')}</label>
-                <select
-                    name="category"
-                    value={localFilters.category}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                >
+        <div className="filters-card">
+            <div className="filter-group">
+                <label className="filter-label">{t('filters.searchCategory')}</label>
+                <select name="category" value={localFilters.category} onChange={handleChange} className="filter-select">
                     <option value="">{t('filters.allCategories')}</option>
                     {PAYMENT_CATEGORIES.map(cat => (
                         <option key={cat} value={cat}>{t(`categories.${cat.toLowerCase().replace(/ /g, '_')}`)}</option>
@@ -56,58 +42,19 @@ const TransactionFilters = ({ filters, onFilterChange }) => {
                 </select>
             </div>
 
-            <div style={{ flex: '1 1 150px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.startDate')}</label>
-                <input
-                    type="date"
-                    name="startDate"
-                    value={localFilters.startDate}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                />
+            <div className="filter-group">
+                <label className="filter-label">{t('filters.startDate')}</label>
+                <input type="date" name="startDate" value={localFilters.startDate} onChange={handleChange} className="filter-input" />
             </div>
 
-            <div style={{ flex: '1 1 150px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#a0a0b0' }}>{t('filters.endDate')}</label>
-                <input
-                    type="date"
-                    name="endDate"
-                    value={localFilters.endDate}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                />
+            <div className="filter-group">
+                <label className="filter-label">{t('filters.endDate')}</label>
+                <input type="date" name="endDate" value={localFilters.endDate} onChange={handleChange} className="filter-input" />
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <button
-                    onClick={handleSearch}
-                    style={{
-                        padding: '8px 20px',
-                        background: 'linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%)',
-                        border: 'none',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        height: '38px'
-                    }}
-                >
-                    {t('common.search')}
-                </button>
-                <button
-                    onClick={handleReset}
-                    style={{
-                        padding: '8px 16px',
-                        background: '#444',
-                        border: 'none',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        height: '38px'
-                    }}
-                >
-                    {t('common.reset')}
-                </button>
+            <div className="filters-actions">
+                <button onClick={handleSearch} className="btn-search">{t('common.search')}</button>
+                <button onClick={handleReset} className="btn-reset">{t('common.reset')}</button>
             </div>
         </div>
     );

@@ -88,13 +88,22 @@ function normalizeAmount(rawAmount) {
     return roundCurrency(parsed);
 }
 
-// GET all transactions for the current user (with filtering support)
+// GET all transactions for the current user (with filtering and sorting support)
 router.get('/api/transactions', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { type, category, startDate, endDate } = req.query;
+    const { type, category, startDate, endDate, sortBy = 'date', sortDir = 'desc' } = req.query;
+    
+    console.log('GET /api/transactions params:', { sortBy, sortDir, type, category, startDate, endDate });
+    
+    // Validate sortBy field to prevent malicious input
+    const allowedSortFields = ['date', 'amount', 'shop', 'category', 'description'];
+    const normalizedSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'date';
+    const normalizedSortDir = sortDir === 'asc' ? 'asc' : 'desc';
+    
+    console.log('Normalized sorting:', { normalizedSortBy, normalizedSortDir });
 
     try {
         const transactions = await db.transaction.findMany({
@@ -108,7 +117,7 @@ router.get('/api/transactions', async (req, res) => {
                 }
             },
             orderBy: {
-                date: 'desc'
+                [normalizedSortBy]: normalizedSortDir
             }
         });
         res.json(transactions);
@@ -124,7 +133,7 @@ router.post('/api/transactions', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { amount, category, shop, description, date, type } = req.body;
+    const { amount, currency, category, shop, description, date, type } = req.body;
 
     // Basic validation
     if (!amount || !date || !type) {
@@ -136,6 +145,7 @@ router.post('/api/transactions', async (req, res) => {
             data: {
                 userId: req.session.userId,
                 amount: roundCurrency(parseFloat(amount)),
+                currency: currency || 'EUR',
                 category,
                 shop,
                 description,
@@ -205,6 +215,7 @@ router.post('/api/transactions/import-csv', async (req, res) => {
             userId: req.session.userId,
             date,
             amount,
+            currency: 'EUR',
             type,
             category: rawCategory || 'Uncategorized',
             shop: rawShop || '',
@@ -240,7 +251,7 @@ router.put('/api/transactions/:id', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { amount, category, shop, description, date, type } = req.body;
+    const { amount, currency, category, shop, description, date, type } = req.body;
     const transactionId = parseInt(req.params.id);
 
     try {
@@ -260,6 +271,7 @@ router.put('/api/transactions/:id', async (req, res) => {
             where: { id: transactionId },
             data: {
                 amount: amount ? roundCurrency(parseFloat(amount)) : undefined,
+                currency: currency || undefined,
                 category,
                 shop,
                 description,

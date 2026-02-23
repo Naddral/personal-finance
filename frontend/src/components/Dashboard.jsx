@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import TransactionForm from './TransactionForm';
+import Modal from './Modal';
+import './Dashboard.css';
 import TransactionList from './TransactionList';
 import ExpensesChart from './ExpensesChart';
 import TransactionFilters from './TransactionFilters';
@@ -16,6 +18,7 @@ const Dashboard = () => {
 
     const [transactions, setTransactions] = useState([]);
     const [editingTransaction, setEditingTransaction] = useState(null);
+    const [showFormModal, setShowFormModal] = useState(false);
 
     const getCurrentMonthRange = () => {
         const now = new Date();
@@ -44,29 +47,39 @@ const Dashboard = () => {
         endDate: initialRange.endDate
     });
 
-    const fetchTransactions = async (currentFilters = filters) => {
+    const [sorting, setSorting] = useState({ sortBy: 'date', sortDir: 'desc' });
+
+    const fetchTransactions = useCallback(async (filtersToUse = filters, sortingToUse = sorting) => {
         try {
-            console.log('Fetching transactions with filters:', currentFilters);
+            console.log('Fetching transactions with filters:', filtersToUse, 'and sorting:', sortingToUse);
             const res = await axios.get('http://localhost:5000/api/transactions', {
                 params: {
-                    type: currentFilters.type || undefined,
-                    category: currentFilters.category || undefined,
-                    startDate: currentFilters.startDate || undefined,
-                    endDate: currentFilters.endDate || undefined
+                    type: filtersToUse.type || undefined,
+                    category: filtersToUse.category || undefined,
+                    startDate: filtersToUse.startDate || undefined,
+                    endDate: filtersToUse.endDate || undefined,
+                    sortBy: sortingToUse.sortBy,
+                    sortDir: sortingToUse.sortDir
                 },
                 withCredentials: true
             });
-            console.log('Received transactions:', res.data.length);
+            console.log('Received transactions:', res.data.length, 'sorted by:', sortingToUse.sortBy, sortingToUse.sortDir);
             setTransactions(res.data);
         } catch (error) {
             console.error('Error fetching transactions:', error);
         }
-    };
+    }, [filters, sorting]);
 
     const handleFilterChange = (newFilters) => {
         const updatedFilters = { ...filters, ...newFilters };
         setFilters(updatedFilters);
-        fetchTransactions(updatedFilters);
+        fetchTransactions(updatedFilters, sorting);
+    };
+
+    const handleSortChange = (sortBy, sortDir) => {
+        const newSorting = { sortBy, sortDir };
+        setSorting(newSorting);
+        fetchTransactions(filters, newSorting);
     };
 
     const [showChart, setShowChart] = useState(false);
@@ -77,7 +90,6 @@ const Dashboard = () => {
                 const response = await axios.get('http://localhost:5000/api/current_user', { withCredentials: true });
                 if (response.data) {
                     setUser(response.data);
-                    fetchTransactions(); // Fetch transactions after user is confirmed
                 } else {
                     navigate('/');
                 }
@@ -87,8 +99,14 @@ const Dashboard = () => {
             }
         };
         fetchUser();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
+
+    useEffect(() => {
+        if (user) {
+            fetchTransactions();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     const handleLogout = () => {
         window.open('http://localhost:5000/api/logout', '_self');
@@ -97,16 +115,17 @@ const Dashboard = () => {
     const handleTransactionAdded = () => {
         fetchTransactions();
         setEditingTransaction(null);
+        setShowFormModal(false);
     };
 
     const handleEdit = (transaction) => {
         setEditingTransaction(transaction);
-        // Optional: Scroll to top to see form
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setShowFormModal(true);
     };
 
     const handleCancelEdit = () => {
         setEditingTransaction(null);
+        setShowFormModal(false);
     };
 
     const handleDelete = async (id) => {
@@ -124,46 +143,22 @@ const Dashboard = () => {
     if (!user) return <div>{t('common.loading')}...</div>;
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', color: '#fff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="dashboard">
+            <div className="header">
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '2rem' }}>{t('dashboard.title')}</h1>
-                    <p style={{ margin: '5px 0 0', color: '#a0a0b0' }}>{t('dashboard.welcome')}, {user.name}!</p>
+                    <h1 className="header-title">{t('dashboard.title')}</h1>
+                    <p className="header-sub">{t('dashboard.welcome')}, {user.name}!</p>
                 </div>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div className="header-actions">
                     <LanguageSelector />
-                    <button onClick={() => setShowChart(true)} style={{
-                        padding: '8px 16px',
-                        background: 'linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
-                        border: 'none',
-                        borderRadius: '6px',
-                        color: '#555',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}>
-                        📊 {t('dashboard.chart')}
-                    </button>
-                    <button onClick={handleLogout} style={{
-                        padding: '8px 16px',
-                        background: '#333',
-                        border: 'none',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        cursor: 'pointer'
-                    }}>{t('common.logout')}</button>
+                    <button className="btn-add" onClick={() => { setEditingTransaction(null); setShowFormModal(true); }}>{t('dashboard.addTransaction')}</button>
+                    <CsvImport onImported={fetchTransactions} compact={true} />
+                    <button className="btn-chart" onClick={() => setShowChart(true)}>📊 {t('dashboard.chart')}</button>
+                    <button className="btn-logout" onClick={handleLogout}>{t('common.logout')}</button>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
-                <div>
-                    <TransactionForm
-                        key={editingTransaction ? editingTransaction.id : 'new'}
-                        onTransactionAdded={handleTransactionAdded}
-                        editingTransaction={editingTransaction}
-                        onCancelEdit={handleCancelEdit}
-                    />
-                    <CsvImport onImported={fetchTransactions} />
-                </div>
+            <div className="layout-grid">
                 <div>
                     <TransactionFilters
                         filters={filters}
@@ -173,6 +168,7 @@ const Dashboard = () => {
                         transactions={transactions}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onSortChange={handleSortChange}
                     />
                 </div>
             </div>
@@ -182,6 +178,17 @@ const Dashboard = () => {
                     transactions={transactions}
                     onClose={() => setShowChart(false)}
                 />
+            )}
+
+            {showFormModal && (
+                <Modal title={editingTransaction ? t('transactions.editTransaction') : t('transactions.newTransaction')} onClose={handleCancelEdit}>
+                    <TransactionForm
+                        key={editingTransaction ? editingTransaction.id : 'new'}
+                        onTransactionAdded={handleTransactionAdded}
+                        editingTransaction={editingTransaction}
+                        onCancelEdit={handleCancelEdit}
+                    />
+                </Modal>
             )}
         </div>
     );

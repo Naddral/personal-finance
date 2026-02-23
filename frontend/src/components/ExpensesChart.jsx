@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a832a8', '#32a8a8', '#a83232'];
+import { BarChart, Bar, Cell, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts';
 
 const ExpensesChart = ({ transactions, onClose }) => {
     const { t } = useTranslation();
@@ -19,8 +17,8 @@ const ExpensesChart = ({ transactions, onClose }) => {
 
             return {
                 data: [
-                    { name: t('dashboard.income'), value: income },
-                    { name: t('dashboard.expenses'), value: expense }
+                    { name: t('dashboard.income'), value: income, rawCategory: 'income' },
+                    { name: t('dashboard.expenses'), value: expense, rawCategory: 'expense' }
                 ],
                 total: income + expense,
                 net: income - expense
@@ -29,28 +27,69 @@ const ExpensesChart = ({ transactions, onClose }) => {
 
         const filtered = transactions.filter(tx => tx.type === view);
         const grouped = filtered.reduce((acc, curr) => {
-            const cat = curr.category || 'Altro';
+            const cat = curr.category || 'ALTRO';
             const translatedCat = t(`categories.${cat.toLowerCase().replace(/ /g, '_')}`, { defaultValue: cat });
-            if (!acc[translatedCat]) acc[translatedCat] = 0;
-            acc[translatedCat] += parseFloat(curr.amount);
+            if (!acc[translatedCat]) acc[translatedCat] = { value: 0, rawCategory: cat };
+            acc[translatedCat].value += parseFloat(curr.amount);
             return acc;
         }, {});
 
         const chartData = Object.keys(grouped).map(key => ({
             name: key,
-            value: grouped[key]
+            value: grouped[key].value,
+            rawCategory: grouped[key].rawCategory
         }));
 
         const totalValue = chartData.reduce((sum, item) => sum + item.value, 0);
 
         return { data: chartData, total: totalValue, net: 0 };
-    }, [transactions, view]);
+    }, [transactions, view, t]);
 
     const getTitle = () => {
         if (view === 'expense') return t('charts.expenseAnalysis');
         if (view === 'income') return t('charts.incomeAnalysis');
         return t('charts.totalBalance');
     };
+
+    // Prepare data for horizontal bar chart: sort descending and compute percentage
+    const barData = React.useMemo(() => {
+        const totalValue = data.reduce((s, it) => s + it.value, 0) || 1;
+        return data
+            .map((d) => ({ ...d, percent: totalValue ? (d.value / totalValue) : 0 }))
+            .sort((a, b) => b.value - a.value)
+            .map((d) => ({ ...d, percentLabel: `${Math.round(d.percent * 100)}%` }));
+    }, [data]);
+
+    const categoryColors = {
+        // Expense categories
+        'SPESE FISSE': '#4a5568',      // Gray-blue (fixed/regular)
+        'NECESSITÀ': '#ef4444',        // Red (essential)
+        'PRELIEVO': '#6b7280',         // Gray (cash withdrawal)
+        'ALIMENTARI': '#f97316',       // Orange (food)
+        'BENZINA': '#064e78',          // Dark blue (fuel)
+        'FUMETTI': '#a855f7',          // Purple (entertainment/comics)
+        'VIDEOGIOCHI': '#06b6d4',      // Cyan (tech/gaming)
+        'ACQUISTI': '#ec4899',         // Pink (shopping)
+        'PELLET': '#92400e',           // Brown (heating material)
+        'CRESCITA': '#16a34a',         // Green (personal growth)
+        'ALTRO': '#9ca3af',            // Gray (other)
+        // Income categories
+        'STIPENDIO': '#22c55e',        // Bright green (salary/income)
+        // Balance view
+        'income': '#4ecd9d',           // Green
+        'expense': '#ff6b6b'           // Red
+    };
+
+    const colors = React.useMemo(() => {
+        if (view === 'balance') {
+            return ['#ff6b6b', '#4ecd9d'];
+        }
+        
+        return barData.map((item) => {
+            const rawCat = item.rawCategory || 'ALTRO';
+            return categoryColors[rawCat] || '#9ca3af';
+        });
+    }, [barData, view]);
 
     return (
         <div style={{
@@ -150,27 +189,22 @@ const ExpensesChart = ({ transactions, onClose }) => {
                     </button>
                 </div>
 
-                <div style={{ width: '100%', height: '300px' }}>
-                    {data.length > 0 ? (
+                <div style={{ width: '100%', height: Math.max(200, barData.length * 48) }}>
+                    {barData.length > 0 ? (
                         <ResponsiveContainer>
-                            <PieChart>
-                                <Pie
-                                    data={data}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    outerRadius={100}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                >
-                                    {data.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
+                            <BarChart layout="vertical" data={barData} margin={{ left: 20, right: 20 }}>
+                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.06} />
+                                <XAxis type="number" tickFormatter={(v) => `€${v.toFixed(0)}`} />
+                                <YAxis type="category" dataKey="name" width={160} />
                                 <Tooltip formatter={(value) => `€${value.toFixed(2)}`} contentStyle={{ backgroundColor: '#333', borderColor: '#555' }} />
                                 <Legend />
-                            </PieChart>
+                                <Bar dataKey="value" isAnimationActive={false}>
+                                    {barData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                    ))}
+                                    <LabelList dataKey="percentLabel" position="inside" style={{ fill: '#fff', fontWeight: 600 }} />
+                                </Bar>
+                            </BarChart>
                         </ResponsiveContainer>
                     ) : (
                         <p style={{ textAlign: 'center', color: '#a0a0b0', marginTop: '100px' }}>

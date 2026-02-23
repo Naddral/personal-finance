@@ -1,0 +1,7 @@
+.filters-card{ background-color:#2a2a40; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 6px rgba(0,0,0,0.1); display:flex; flex-wrap:wrap; gap:15px; align-items:flex-end }
+.filter-group{ flex:1 1 200px }
+.filter-label{ display:block; margin-bottom:5px; font-size:0.85rem; color:#a0a0b0 }
+.filter-select, .filter-input{ width:100%; padding:8px; border-radius:6px; border:1px solid #444; background:#1e1e2f; color:white }
+.filters-actions{ display:flex; gap:10px }
+.btn-search{ padding:8px 20px; background:linear-gradient(90deg,#00d2ff 0%,#3a7bd5 100%); border:none; border-radius:6px; color:#fff; font-weight:bold; cursor:pointer; height:38px }
+.btn-reset{ padding:8px 16px; background:#444; border:none; border-radius:6px; color:#fff; cursor:pointer; height:38px }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import './LanguageSelector.css';
 
 const LanguageSelector = () => {
     const { i18n } = useTranslation();
@@ -13,35 +14,17 @@ const LanguageSelector = () => {
             <button
                 onClick={() => changeLanguage('it')}
                 className={i18n.language === 'it' ? 'active' : ''}
+                title="Italiano"
             >
-                IT
+                🇮🇹
             </button>
             <button
                 onClick={() => changeLanguage('en')}
                 className={i18n.language === 'en' ? 'active' : ''}
+                title="English"
             >
-                EN
+                🇬🇧
             </button>
-
-            <style jsx>{`
-        .language-selector {
-          display: flex;
-          gap: 10px;
-          margin: 10px;
-        }
-        button {
-          padding: 5px 10px;
-          border: 1px solid #ccc;
-          background: #f0f0f0;
-          cursor: pointer;
-          border-radius: 4px;
-        }
-        button.active {
-          background: #007bff;
-          color: white;
-          border-color: #007bff;
-        }
-      `}</style>
         </div>
     );
 };

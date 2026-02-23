@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './TransactionForm.css';
 import axios from 'axios';
 import { PAYMENT_CATEGORIES, INCOME_CATEGORIES } from '../constants/categories';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +9,7 @@ const TransactionForm = ({ onTransactionAdded, editingTransaction, onCancelEdit 
     const [formData, setFormData] = useState(editingTransaction ? {
         date: editingTransaction.date,
         amount: editingTransaction.amount,
+        currency: editingTransaction.currency || 'EUR',
         category: editingTransaction.category,
         shop: editingTransaction.shop || '',
         description: editingTransaction.description || '',
@@ -15,6 +17,7 @@ const TransactionForm = ({ onTransactionAdded, editingTransaction, onCancelEdit 
     } : {
         date: new Date().toISOString().split('T')[0],
         amount: '',
+        currency: 'EUR',
         category: '',
         shop: '',
         description: '',
@@ -58,53 +61,30 @@ const TransactionForm = ({ onTransactionAdded, editingTransaction, onCancelEdit 
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{
-            backgroundColor: '#2a2a40',
-            padding: '20px',
-            borderRadius: '12px',
-            marginBottom: '20px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }} >
-            <h3 style={{ marginTop: 0, marginBottom: '15px' }}>
-                {editingTransaction ? t('transactions.editTransaction') : t('transactions.newTransaction')}
-            </h3>
+        <form onSubmit={handleSubmit} className="form-card">
+            <h3 className="form-title">{editingTransaction ? t('transactions.editTransaction') : t('transactions.newTransaction')}</h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div className="form-grid">
                 <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.date')}</label>
-                    <input
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                    />
+                    <label className="form-label">{t('transactions.date')}</label>
+                    <input type="date" name="date" value={formData.date} onChange={handleChange} required className="form-input" />
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.amount')} (€)</label>
-                    <input
-                        type="number"
-                        name="amount"
-                        step="0.01"
-                        value={formData.amount}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                    />
+                    <label className="form-label">{t('transactions.amount')} (€)</label>
+                    <div className="input-row">
+                        <input type="number" name="amount" step="0.01" value={formData.amount} onChange={handleChange} required className="form-input" />
+
+                        <select name="currency" value={formData.currency} onChange={handleChange} className={`form-input currency-select`}>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div className="form-grid">
                 <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.category')}</label>
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                    >
+                    <label className="form-label">{t('transactions.category')}</label>
+                    <select name="category" value={formData.category} onChange={handleChange} required className="form-input">
                         <option value="" disabled>{t('transactions.selectCategory')}</option>
                         {(formData.type === 'expense' ? PAYMENT_CATEGORIES : INCOME_CATEGORIES).map(cat => (
                             <option key={cat} value={cat}>{t(`categories.${cat.toLowerCase().replace(/ /g, '_')}`)}</option>
@@ -112,71 +92,32 @@ const TransactionForm = ({ onTransactionAdded, editingTransaction, onCancelEdit 
                     </select>
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.shop')}</label>
-                    <input
-                        type="text"
-                        name="shop"
-                        value={formData.shop}
-                        onChange={handleChange}
-                        placeholder={t('transactions.shopPlaceholder')}
-                        style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                    />
+                    <label className="form-label">{t('transactions.shop')}</label>
+                    <input type="text" name="shop" value={formData.shop} onChange={handleChange} placeholder={t('transactions.shopPlaceholder')} className="form-input" />
                 </div>
             </div>
 
             <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.description')}</label>
-                <input
-                    type="text"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder={t('transactions.descriptionPlaceholder')}
-                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                />
+                <label className="form-label">{t('transactions.description')}</label>
+                <input type="text" name="description" value={formData.description} onChange={handleChange} placeholder={t('transactions.descriptionPlaceholder')} className="form-input" />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#a0a0b0' }}>{t('transactions.type')}</label>
-                <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #444', background: '#1e1e2f', color: 'white' }}
-                >
+                <label className="form-label">{t('transactions.type')}</label>
+                <select name="type" value={formData.type} onChange={handleChange} className="form-input">
                     <option value="expense">{t('transactions.typeExpense')}</option>
                     <option value="income">{t('transactions.typeIncome')}</option>
                 </select>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" style={{
-                    flex: 1,
-                    padding: '12px',
-                    background: 'linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                }}>
-                    {editingTransaction ? t('transactions.saveChanges') : t('dashboard.addTransaction')}
-                </button>
+            <div className="btn-row">
+                <button type="submit" className="btn-submit">{editingTransaction ? t('transactions.saveChanges') : t('dashboard.addTransaction')}</button>
 
                 {editingTransaction && (
-                    <button type="button" onClick={onCancelEdit} style={{
-                        padding: '12px 20px',
-                        background: 'transparent',
-                        border: '1px solid #444',
-                        borderRadius: '6px',
-                        color: '#a0a0b0',
-                        cursor: 'pointer'
-                    }}>
-                        {t('common.cancel')}
-                    </button>
+                    <button type="button" onClick={onCancelEdit} className="btn-cancel">{t('common.cancel')}</button>
                 )}
             </div>
-        </form >
+        </form>
     );
 };
 

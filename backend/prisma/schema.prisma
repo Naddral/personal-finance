@@ -21,6 +21,7 @@ model Transaction {
   id          Int      @id @default(autoincrement())
   userId      Int      @map("user_id")
   amount      Float
+  currency    String   @default("EUR")
   category    String?
   shop        String?
   description String?

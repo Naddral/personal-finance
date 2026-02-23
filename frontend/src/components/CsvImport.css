@@ -1,0 +1,5 @@
+.csv-import{ display:inline-flex; flex-direction:column; gap:6px }
+.csv-import.inline{ flex-direction:row; align-items:center }
+.csv-btn{ padding:8px 12px; background:linear-gradient(90deg,#16c79a 0%,#0f9baf 100%); border:none; border-radius:6px; color:#fff; font-weight:600; cursor:pointer }
+.csv-btn:disabled{ opacity:0.7; cursor:not-allowed }
+.csv-message{ color:#d7d7e0; font-size:0.9rem }

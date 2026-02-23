@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import './TransactionList.css';
 
-const TransactionList = ({ transactions, onEdit, onDelete }) => {
+const TransactionList = ({ transactions, onEdit, onDelete, onSortChange }) => {
     const { t } = useTranslation();
 
     const formatAmount = (amount) => {
@@ -16,93 +17,63 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
         }).format(numeric);
     };
 
+    const [sortBy, setSortBy] = useState({ field: 'date', dir: 'desc' });
+
+    const toggleSort = (field) => {
+        const newSort = sortBy.field === field
+            ? { field, dir: sortBy.dir === 'asc' ? 'desc' : 'asc' }
+            : { field, dir: 'desc' };
+        setSortBy(newSort);
+        if (onSortChange) {
+            onSortChange(newSort.field, newSort.dir);
+        }
+    };
+
+    const headerIndicator = (field) => {
+        if (sortBy.field !== field) return '';
+        return sortBy.dir === 'asc' ? ' ▲' : ' ▼';
+    };
+
     return (
-        <div style={{
-            backgroundColor: '#2a2a40',
-            padding: '20px',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            overflowX: 'auto'
-        }}>
-            <h3 style={{ marginTop: 0, marginBottom: '15px' }}>{t('dashboard.recentTransactions')}</h3>
+        <div className="transactions-card">
+            <h3 className="transactions-title">{t('dashboard.recentTransactions')}</h3>
 
             {transactions.length === 0 ? (
-                <p style={{ color: '#a0a0b0', fontStyle: 'italic' }}>{t('transactions.noTransactions')}</p>
+                <p className="empty-text">{t('transactions.noTransactions')}</p>
             ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                        <tr style={{ borderBottom: '1px solid #444' }}>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.date')}</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.shop')}</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.category')}</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.description')}</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.amount')}</th>
-                            <th style={{ padding: '10px', color: '#a0a0b0' }}>{t('transactions.actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {transactions.map((tx) => (
-                            <tr key={tx.id} style={{ borderBottom: '1px solid #333' }}>
-                                <td style={{ padding: '10px' }}>{tx.date}</td>
-                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{tx.shop}</td>
-                                <td style={{ padding: '10px' }}>
-                                    <span style={{
-                                        padding: '4px 8px',
-                                        borderRadius: '12px',
-                                        background: '#333',
-                                        fontSize: '0.85rem'
-                                    }}>
-                                        {t(`categories.${tx.category.toLowerCase().replace(/ /g, '_')}`, { defaultValue: tx.category })}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '10px', color: '#ccc', fontSize: '0.9rem' }}>{tx.description}</td>
-                                <td style={{
-                                    padding: '10px',
-                                    fontWeight: 'bold',
-                                    color: tx.type === 'expense' ? '#ff6b6b' : '#4ecd9d'
-                                }}>
-                                    {tx.type === 'expense' ? '-' : '+'} EUR {formatAmount(tx.amount)}
-                                </td>
-                                <td style={{ padding: '10px' }}>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
-                                        <button
-                                            onClick={() => onEdit(tx)}
-                                            style={{
-                                                background: 'transparent',
-                                                border: '1px solid #555',
-                                                borderRadius: '4px',
-                                                color: '#fff',
-                                                padding: '4px 8px',
-                                                cursor: 'pointer',
-                                                fontSize: '0.85rem'
-                                            }}
-                                        >
-                                            {t('common.edit')}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                if (window.confirm(t('transactions.confirmDelete'))) {
-                                                    onDelete(tx.id);
-                                                }
-                                            }}
-                                            style={{
-                                                background: 'transparent',
-                                                border: '1px solid #ff4d4d',
-                                                borderRadius: '4px',
-                                                color: '#ff4d4d',
-                                                padding: '4px 8px',
-                                                cursor: 'pointer',
-                                                fontSize: '0.85rem'
-                                            }}
-                                        >
-                                            {t('common.delete')}
-                                        </button>
-                                    </div>
-                                </td>
+                <div className="table-wrapper">
+                    <table className="transactions-table">
+                        <thead>
+                            <tr>
+                                <th><button className="header-btn" onClick={() => toggleSort('date')}>{t('transactions.date')}{headerIndicator('date')}</button></th>
+                                <th><button className="header-btn" onClick={() => toggleSort('shop')}>{t('transactions.shop')}{headerIndicator('shop')}</button></th>
+                                <th><button className="header-btn" onClick={() => toggleSort('category')}>{t('transactions.category')}{headerIndicator('category')}</button></th>
+                                <th><button className="header-btn" onClick={() => toggleSort('description')}>{t('transactions.description')}{headerIndicator('description')}</button></th>
+                                <th><button className="header-btn" onClick={() => toggleSort('amount')}>{t('transactions.amount')}{headerIndicator('amount')}</button></th>
+                                <th>{t('transactions.actions')}</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {transactions.map((tx, idx) => (
+                                <tr key={tx.id} className={idx % 2 === 0 ? '' : 'zebra'}>
+                                    <td className="cell nowrap">{tx.date}</td>
+                                    <td className="cell" style={{ fontWeight: 700 }}>{tx.shop}</td>
+                                    <td className="cell">
+                                        <span className="badge">{t(`categories.${tx.category.toLowerCase().replace(/ /g, '_')}`, { defaultValue: tx.category })}</span>
+                                    </td>
+                                    <td className="cell" style={{ color: '#ccc', fontSize: '0.9rem' }}>{tx.description}</td>
+                                    <td className={`amount ${tx.type === 'expense' ? 'expense' : 'income'}`}>{tx.currency || 'EUR'} {formatAmount(tx.amount)}</td>
+                                    <td className="actions-cell">
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn btn-edit" onClick={() => onEdit(tx)}>{t('common.edit')}</button>
+                                            <button className="btn btn-delete" onClick={() => { if (window.confirm(t('transactions.confirmDelete'))) { onDelete(tx.id); } }}>{t('common.delete')}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
         </div>
     );

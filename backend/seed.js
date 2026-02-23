@@ -82,6 +82,7 @@ const seed = async () => {
                 data: {
                     userId: user1.id,
                     amount: t.amount,
+                    currency: 'EUR',
                     category: t.category,
                     shop: t.shop,
                     description: t.description,

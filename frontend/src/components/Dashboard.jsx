@@ -7,6 +7,7 @@ import TransactionList from './TransactionList';
 import ExpensesChart from './ExpensesChart';
 import TransactionFilters from './TransactionFilters';
 import LanguageSelector from './LanguageSelector';
+import CsvImport from './CsvImport';
 
 const Dashboard = () => {
     const { t } = useTranslation();
@@ -161,6 +162,7 @@ const Dashboard = () => {
                         editingTransaction={editingTransaction}
                         onCancelEdit={handleCancelEdit}
                     />
+                    <CsvImport onImported={fetchTransactions} />
                 </div>
                 <div>
                     <TransactionFilters

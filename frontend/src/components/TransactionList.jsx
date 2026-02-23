@@ -3,6 +3,19 @@ import { useTranslation } from 'react-i18next';
 
 const TransactionList = ({ transactions, onEdit, onDelete }) => {
     const { t } = useTranslation();
+
+    const formatAmount = (amount) => {
+        const numeric = Number(amount);
+        if (!Number.isFinite(numeric)) {
+            return '0,00';
+        }
+
+        return new Intl.NumberFormat('it-IT', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(numeric);
+    };
+
     return (
         <div style={{
             backgroundColor: '#2a2a40',
@@ -48,7 +61,7 @@ const TransactionList = ({ transactions, onEdit, onDelete }) => {
                                     fontWeight: 'bold',
                                     color: tx.type === 'expense' ? '#ff6b6b' : '#4ecd9d'
                                 }}>
-                                    {tx.type === 'expense' ? '-' : '+'} €{tx.amount}
+                                    {tx.type === 'expense' ? '-' : '+'} EUR {formatAmount(tx.amount)}
                                 </td>
                                 <td style={{ padding: '10px' }}>
                                     <div style={{ display: 'flex', gap: '8px' }}>
